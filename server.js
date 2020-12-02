@@ -17,7 +17,7 @@ const posts = [
   }
 ]
 
-app.get('/posts', authenticateToken, (req, res) => {
+app.get('/posts', (req, res) => {
   res.json(posts.filter(post => post.username === req.user.name))
 })
 
