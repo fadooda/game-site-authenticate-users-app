@@ -80,25 +80,5 @@ function generateAccessToken(user)
 }
 
 
-app.get('/games/authenticate',cors(), authenticateToken, (req,res)=>{
-    res.json(true)
-})
-
-function authenticateToken(req,res,next)
-{
-     const authHeader = req.headers['authorization']
-     const token = authHeader && authHeader.split(' ')[1]
-     if(token == null) 
-     {
-         return res.sendStatus(401)
-     }
-     //console.log(token)
-     //console.log(process.env.ACCESS_TOKEN_SECRET)
-     jwt.verify(token,process.env.ACCESS_TOKEN_SECRET,(err,user)=>{
-         if(err) return res.sendStatus(401)
-         req.user = user 
-         next()
-     })
-}
 
 app.listen(process.env.PORT || 4000, ()=>{console.log(4000)})
