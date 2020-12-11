@@ -31,6 +31,7 @@ app.post('/login',cors(), (req,res)=>{
         if(dbuser==null)
         {
             console.log("User doesn't Exist")
+            res.sendStatus(404)
         }else{
             let str=dbuser
             const compare = await bcrypt.compare(req.body.password, dbuser.password);
@@ -67,9 +68,12 @@ app.post('/register',cors(), (req,res)=>{
         {
             req.body.password = await bcrypt.hash(req.body.password, 10)
             dbConnect.addUser(req)
+            res.sendStatus(204)
         }else{
             let str="user: " + dbuser.userName +" already exists"
-            res.json({str})
+            console.log(str)
+            res.sendStatus(409)
+            //res.json({str})
         }
     })
     })
@@ -80,5 +84,5 @@ function generateAccessToken(user)
 }
 
 
-
+//Heroku dynamically assigns your app a port, so you can't set the port to a fixed number. Heroku adds the port to the env, so you can pull it from there. 
 app.listen(process.env.PORT || 4000, ()=>{console.log(4000)})
