@@ -66,8 +66,9 @@ app.post('/register',cors(), (req,res)=>{
        //console.log(dbuser.userName)
         if(dbuser==null)
         {
+            console.log(":::Registering User:::")
             req.body.password = await bcrypt.hash(req.body.password, 10)
-            dbConnect.addUser(req)
+            //dbConnect.addUser(req)
             res.sendStatus(204)
         }else{
             let str="user: " + dbuser.userName +" already exists"
@@ -80,7 +81,7 @@ app.post('/register',cors(), (req,res)=>{
 
 function generateAccessToken(user)
 {
-    return jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn: '120s'})
+    return jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn: '700s'})
 }
 
 
