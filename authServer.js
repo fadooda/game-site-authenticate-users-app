@@ -68,7 +68,7 @@ app.post('/register',cors(), (req,res)=>{
         {
             console.log(":::Registering User:::")
             req.body.password = await bcrypt.hash(req.body.password, 10)
-            //dbConnect.addUser(req)
+            dbConnect.addUser(req)
             res.sendStatus(204)
         }else{
             let str="user: " + dbuser.userName +" already exists"
@@ -86,4 +86,4 @@ function generateAccessToken(user)
 
 
 //Heroku dynamically assigns your app a port, so you can't set the port to a fixed number. Heroku adds the port to the env, so you can pull it from there. 
-app.listen(process.env.PORT || 4000, ()=>{console.log(4000)})
+app.listen(process.env.PORT || 4000, ()=>{console.log(process.env.PORT)})
