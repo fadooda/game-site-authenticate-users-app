@@ -1,6 +1,3 @@
-GET http://localhost:3000/posts
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSmltIiwiaWF0IjoxNTY4NzU5ODEyLCJleHAiOjE1Njg3NTk4Mjd9.0i6Im2gKz7jj8wM7aZZzOPaBS_xHoZWAqBwnldn-lQQ
-
 ###
 
 DELETE http://localhost:4000/logout
@@ -21,5 +18,33 @@ Content-Type: application/json
 
 ###
 
+POST http://localhost:4000/token HTTP/1.1
+Content-Type: application/json
 
-POST http://localhost:4000/posts
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiamltIiwiaWF0IjoxNjAzMzc4NTU5fQ.Z8gWgX8dsoBE_uwhkDQQwL2djA_AKojZsKLpDl-Xz7g"
+
+}
+###
+DELETE http://localhost:4000/logout
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiamltIiwiaWF0IjoxNjAzMzc4NTU5fQ.Z8gWgX8dsoBE_uwhkDQQwL2djA_AKojZsKLpDl-Xz7g"
+}
+###
+POST http://localhost:4000/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "password": "nalla"
+}
+###
+POST localhost:4000/register HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "email@email.com",
+    "password": "password"
+}
+

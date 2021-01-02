@@ -1,38 +1,39 @@
-require('dotenv').config();
-const express = require('express');
+require('dotenv').config()
+const express = require('express')
 const cors = require('cors')
-const jwt = require('jsonwebtoken');
-const dbConnect = require('./connectDB');
-const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
+const dbConnect = require('./connectDB')
+const bcrypt = require('bcrypt')
 const app = express()
 
 
-app.options('/login', cors()) // enable pre-flight request for DELETE request
-app.options('/register', cors()) // enable pre-flight request for DELETE request
+app.options('/login', cors()) // enable pre-flight request for login request
+app.options('/register', cors()) // enable pre-flight request for register request
 app.use(express.json())
 
 
 var refreshTokenList = []
 
+/**
+ * Route: /login
+ * 
+ */
+app.post('/login',cors(), (req,res)=>{ 
 
-app.post('/login',cors(), (req,res)=>{
-
-    console.log(process.env.REFRESH_TOKEN_SECRET)
-    let user= {"userName": req.body.userName}
-    dbConnect.getUser(user, async function(dbuser /* a is passed using callback */) {
-
+    let user= {"userName": req.body.userName} //pull out user name from the http request sent by the client
+    
+    dbConnect.getUser(user, async function(dbuser /* dbuser is the user name return by the monogodb*/) {
         if(dbuser==null)
         {
-            console.log("User doesn't Exist")
+            console.log(`User ${user} doesn't Exist`)
             res.sendStatus(404)
         }else{
             let str=dbuser
-            const compare = await bcrypt.compare(req.body.password, dbuser.password);
+            const compare = await bcrypt.compare(req.body.password, dbuser.password); //check encrypted password from the mongodb database with the user input
             if(compare)
             {
                 const accessToken = generateAccessToken(user)
-                const refreshToken = jwt.sign(user,process.env.REFRESH_TOKEN_SECRET)
-                res.json({accessToken: accessToken, refreshToken: refreshToken})
+                res.json({accessToken: accessToken, refreshToken: refreshToken}) //send json formatted objects of the access token generate
             }else{
                 str+= " Incorrect password"
                 res.sendStatus(401)
@@ -42,13 +43,15 @@ app.post('/login',cors(), (req,res)=>{
 
     })
 
+/**
+ * Route: /register
+ * Note: use call back to prevent the server from executing the next line of codes until the database returns 
+ */
 app.post('/register',cors(), (req,res)=>{
 
     let user= {"userName": req.body.userName}
 
-    //use call back to prevent the server from executing the next line of codes until the database returns 
-    dbConnect.getUser(user, async function(dbuser /* a is passed using callback */) {
-
+    dbConnect.getUser(user, async function(dbuser /* dbuser is the user name return by the monogodb*/) {
         if(dbuser==null)
         {
             console.log(":::Registering User:::")
@@ -63,10 +66,23 @@ app.post('/register',cors(), (req,res)=>{
     })
     })
 
+    
+/*
+Route get function, it takes the client request and checks if the token is valid 
+*/
 app.get('/games/authenticate',cors(), authenticateToken, (req,res)=>{
     res.json(true)
 })
-        
+
+/**
+ * authenticateToken: A function that Authenticates a jwt token, to ensure that both the user has logged in and that the user's access token is still not expired
+ * 
+ * AuthenticateToken function will strip the authorization header from the request 
+ * Then check the token against the ACCESS_TOKEN_SECRET to verify that the token is vaild
+ * 
+ * if the token is valid move to the next middlewear function 
+ * else return 401 (unauthorized) status
+ */
 function authenticateToken(req,res,next)
 {
      const authHeader = req.headers['authorization']
@@ -89,5 +105,5 @@ function generateAccessToken(user)
 }
 
 
-//Heroku dynamically assigns your app a port, so you can't set the port to a fixed number. Heroku adds the port to the env, so you can pull it from there. 
-app.listen(process.env.PORT || 4000, ()=>{console.log(process.env.PORT)})
+//Heroku dynamically assigns your app a port, so you can't manually set the port to a fixed number. Heroku adds the port to the env, so you can pull it from there. 
+app.listen(process.env.PORT || process.env.PORT_DEV, ()=>{console.log(process.env.PORT)})
