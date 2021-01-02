@@ -12,7 +12,6 @@ app.options('/register', cors()) // enable pre-flight request for register reque
 app.use(express.json())
 
 
-var refreshTokenList = []
 
 /**
  * Route: /login
@@ -33,6 +32,7 @@ app.post('/login',cors(), (req,res)=>{
             if(compare)
             {
                 const accessToken = generateAccessToken(user)
+                const refreshToken = jwt.sign(user,process.env.REFRESH_TOKEN_SECRET)
                 res.json({accessToken: accessToken, refreshToken: refreshToken}) //send json formatted objects of the access token generate
             }else{
                 str+= " Incorrect password"
