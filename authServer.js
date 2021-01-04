@@ -21,13 +21,14 @@ app.post('/login',cors(), (req,res)=>{
 
     let user= {"userName": req.body.userName} //pull out user name from the http request sent by the client
     
+    console.log(":::Loging in User:::")
     dbConnect.getUser(user, async function(dbuser /* dbuser is the user name return by the monogodb*/) {
         if(dbuser==null)
         {
-            console.log(`User ${user} doesn't Exist`)
+            console.log(`User::: ${user} doesn't Exist`)
             res.sendStatus(404)
         }else{
-            let str=dbuser
+            let str=''
             const compare = await bcrypt.compare(req.body.password, dbuser.password); //check encrypted password from the mongodb database with the user input
             if(compare)
             {
@@ -35,7 +36,8 @@ app.post('/login',cors(), (req,res)=>{
                 const refreshToken = jwt.sign(user,process.env.REFRESH_TOKEN_SECRET)
                 res.json({accessToken: accessToken, refreshToken: refreshToken}) //send json formatted objects of the access token generate
             }else{
-                str+= " Incorrect password"
+                str=`Incorrect password for user::: ${dbuser}`
+                console.log(str)
                 res.sendStatus(401)
             }
         }
@@ -99,9 +101,10 @@ function authenticateToken(req,res,next)
      })
 }
 
+//generate a signed jwt token
 function generateAccessToken(user)
 {
-    return jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn: '700s'})
+    return jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn: process.env.ACCESS_TOKEN_EXPIRATION_TIME})
 }
 
 
