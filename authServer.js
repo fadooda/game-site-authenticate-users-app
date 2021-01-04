@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 const dbConnect = require('./connectDB')
 const bcrypt = require('bcrypt')
 const app = express()
-
+const PORT = process.env.PORT ||  process.env.PORT_DEV
 
 app.options('/login', cors()) // enable pre-flight request for login request
 app.options('/register', cors()) // enable pre-flight request for register request
@@ -104,9 +104,9 @@ function authenticateToken(req,res,next)
 //generate a signed jwt token
 function generateAccessToken(user)
 {
-    return jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn: process.env.ACCESS_TOKEN_EXPIRATION_TIME})
+    return jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn: `${process.env.ACCESS_TOKEN_EXPIRATION_TIME}s`})
 }
 
 
 //Heroku dynamically assigns your app a port, so you can't manually set the port to a fixed number. Heroku adds the port to the env, so you can pull it from there. 
-app.listen(process.env.PORT || process.env.PORT_DEV, ()=>{console.log(process.env.PORT)})
+app.listen(PORT, ()=>console.log(`Server has started on port: ${PORT}`))
